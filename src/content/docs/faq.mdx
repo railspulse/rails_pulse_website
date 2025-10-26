@@ -1,0 +1,111 @@
+---
+title: Frequently Asked Questions
+description: Everything you need to know about Rails Pulse
+---
+
+## What Rails versions are supported?
+
+Rails Pulse supports Rails 7.2+ and Ruby 3.3+. It's built as a Rails Engine and follows Rails best practices, ensuring compatibility with the latest Rails versions.
+
+## Does Rails Pulse impact my application's performance?
+
+Rails Pulse is designed with minimal performance overhead in mind. It uses smart caching, efficient instrumentation, and Rails' built-in ActiveSupport::Notifications to collect metrics without slowing down your application. You can enable or disable it per environment.
+
+## Can I use a separate database for Rails Pulse?
+
+Yes! Rails Pulse supports two database configurations:
+
+1. **Single Database (default)** - Stores data in your main application database. Simple setup with zero additional configuration.
+2. **Separate Database** - Use a dedicated database for complete isolation. Supports SQLite, PostgreSQL, and MySQL. Perfect for scaling monitoring independently or using different database engines.
+
+Install with `--database=separate` flag to use a separate database. See the [Database](/documentation/database) documentation for details.
+
+## How do I secure the Rails Pulse dashboard?
+
+Rails Pulse includes flexible authentication support. You can configure authentication in the initializer to work with Devise, custom authentication systems, or any authentication method. Simply define your authentication logic in the configuration.
+
+See the [Authentication](/documentation/authentication) documentation for examples.
+
+## How does data cleanup work?
+
+Rails Pulse offers automatic data archiving with two strategies:
+
+1. **Time-based cleanup** - Automatically delete records older than a configured period (default: 30 days)
+2. **Count-based cleanup** - Enforce maximum record limits per table to prevent excessive storage use
+
+Schedule the `RailsPulse::CleanupJob` to run daily, or run cleanup manually with `rails rails_pulse:cleanup`.
+
+See the [Advanced Configuration](/documentation/advanced#data-cleanup) for details.
+
+## Is Rails Pulse free?
+
+Yes! Rails Pulse is completely free and open source under the MIT License. No subscription fees, no usage limits, and no external dependencies. All performance data stays in your database.
+
+## How is Rails Pulse different from APM services?
+
+Rails Pulse offers several advantages:
+
+- **No external dependencies** - Everything runs in your Rails application
+- **Zero monthly costs** - No subscription fees or usage-based pricing
+- **Data privacy** - All metrics stay in your database
+- **Full customization** - Complete control over thresholds and interface
+- **Rails-native** - Built specifically for Rails with deep framework integration
+
+Perfect for development, staging, and cost-conscious production monitoring.
+
+## Which background job adapters are supported?
+
+Rails Pulse supports all ActiveJob adapters through universal tracking:
+
+- **Sidekiq** - Enhanced tracking via custom middleware
+- **Solid Queue** - Universal ActiveJob tracking
+- **Good Job** - Universal ActiveJob tracking
+- **Delayed Job** - Enhanced tracking via custom plugin
+- **Resque** - Universal ActiveJob tracking
+- **Any ActiveJob adapter** - Falls back to universal tracking
+
+No configuration needed - job tracking works out of the box.
+
+## Can I exclude specific routes or jobs from tracking?
+
+Yes! You can exclude routes, jobs, queries, and more using the configuration:
+
+- `config.ignored_routes` - Exclude specific routes or patterns
+- `config.ignored_jobs` - Exclude specific job classes
+- `config.ignored_queues` - Exclude specific job queues
+- `config.track_assets = false` - Ignore asset requests
+
+See the [Advanced Configuration](/documentation/advanced#filtering) for examples.
+
+## How do I update Rails Pulse?
+
+Update Rails Pulse like any other gem:
+
+1. Update the version in your Gemfile
+2. Run `bundle update rails_pulse`
+3. Run `rails db:migrate` to apply any new migrations
+4. Restart your Rails server
+
+Check the [releases page](https://github.com/railspulse/rails_pulse/releases) for changelog and breaking changes.
+
+## Where can I get help or report issues?
+
+We're here to help:
+
+- [GitHub Issues](https://github.com/railspulse/rails_pulse/issues) - Report bugs or request features
+- [GitHub Discussions](https://github.com/railspulse/rails_pulse/discussions) - Ask questions and share ideas
+- [Documentation](https://github.com/railspulse/rails_pulse) - Full README and guides
+
+## Still Have Questions?
+
+### Browse Documentation
+
+Explore our complete documentation for detailed guides and examples.
+
+[Read Docs →](/documentation/installation)
+
+### Get Support
+
+Ask questions on GitHub Discussions or report issues.
+
+[GitHub →](https://github.com/railspulse/rails_pulse/issues)

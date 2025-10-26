@@ -1,0 +1,138 @@
+---
+title: "Installation"
+description: "Get started with Rails Pulse in minutes. This guide walks you through installation, basic setup, and configuration."
+---
+
+## Requirements
+
+Rails Pulse requires:
+
+- **Ruby 3.3+**
+- **Rails 7.2+**
+- **Database:** SQLite, PostgreSQL, or MySQL
+
+## Installation Steps
+
+### 1. Add the Gem
+
+Add Rails Pulse to your application's Gemfile:
+
+```ruby
+# Gemfile
+gem 'rails_pulse'
+```
+
+### 2. Install the Gem
+
+Run bundle install:
+
+```bash
+bundle install
+```
+
+### 3. Generate Installation Files
+
+Generate the Rails Pulse configuration and database files:
+
+```bash
+# Install with single database setup (default - recommended)
+rails generate rails_pulse:install
+
+# Or install with separate database setup
+rails generate rails_pulse:install --database=separate
+```
+
+### 4. Run Migrations
+
+**For single database setup (default):**
+
+```bash
+rails db:migrate
+```
+
+**For separate database setup:**
+
+1. Configure `config/database.yml` with your Rails Pulse database settings
+2. Run: `rails db:prepare` to create and load the schema
+
+See the [Database](/documentation/database) documentation for detailed configuration examples.
+
+### 5. Mount the Engine
+
+Add the Rails Pulse route to your application:
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  mount RailsPulse::Engine => "/rails_pulse"
+end
+```
+
+## Quick Setup
+
+Rails Pulse automatically starts collecting performance data once installed. Access your monitoring dashboard at:
+
+```
+http://localhost:3000/rails_pulse
+```
+
+> **Database Setup Options**
+>
+> **Single Database (default):** Rails Pulse tables are created in your main database - no additional configuration needed.
+>
+> **Separate Database:** See the [Database](/documentation/database) section for setup instructions.
+
+## Schedule Background Jobs
+
+Rails Pulse uses two background jobs to maintain performance data. Schedule them using your preferred job scheduler (cron, whenever, solid_queue, etc.):
+
+```ruby
+# Schedule to run 5 minutes past every hour
+# cron: 5 * * * *
+RailsPulse::SummaryJob.perform_later
+
+# Schedule to run daily
+# cron: 0 1 * * *
+RailsPulse::CleanupJob.perform_later
+```
+
+## Basic Configuration
+
+The installation generator creates `config/initializers/rails_pulse.rb` with sensible defaults. Here are some common configuration options:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  # Enable or disable Rails Pulse
+  config.enabled = true
+
+  # Set performance thresholds (in milliseconds)
+  config.request_thresholds = {
+    slow: 700,
+    very_slow: 2000,
+    critical: 4000
+  }
+
+  # Track background jobs
+  config.track_jobs = true
+
+  # Enable automatic cleanup
+  config.archiving_enabled = true
+end
+```
+
+For complete configuration options, see the [Advanced Configuration](/documentation/advanced) documentation.
+
+## Next Steps
+
+### Explore Features
+
+Learn about the dashboard, SQL tracking, background job monitoring, and more.
+
+[View Features →](/documentation/features)
+
+### Secure Your Dashboard
+
+Set up authentication to protect access to your monitoring dashboard.
+
+[Setup Authentication →](/documentation/authentication)

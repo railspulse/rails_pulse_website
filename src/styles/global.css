@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-outfit: "Outfit Variable", "sans-serif";
+  --color-primary: oklch(0.82 0.14 85);
+  --color-primary-content: #000000;
+}
+
+[data-theme="light"],
+:root {
+  --p: oklch(0.82 0.14 85); /* #ffc91f */
+  --pc: oklch(0 0 0); /* #000000 */
+  --s: 48 95% 68%;
+  --a: 166 70% 53%;
+  --n: 220 18% 28%;
+  --b1: 0 0% 100%;
+  --b2: 220 17% 98%;
+  --b3: 0 0% 94%;
+  --bc: 220 19% 17%;
+}
+
+[data-theme="dark"] {
+  --p: oklch(0.82 0.14 85); /* #ffc91f */
+  --pc: oklch(0 0 0); /* #000000 */
+  --s: 48 95% 68%;
+  --a: 166 70% 53%;
+  --n: 220 19% 17%;
+  --b1: 219 20% 14%;
+  --b2: 219 18% 11%;
+  --b3: 218 18% 9%;
+  --bc: 220 13% 69%;
+}
+
+/* Force override DaisyUI primary color */
+* {
+  --color-primary: oklch(0.82 0.14 85) !important;
+}

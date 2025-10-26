@@ -1,0 +1,120 @@
+---
+title: Features
+description: Rails Pulse provides comprehensive performance monitoring with an intuitive dashboard, detailed metrics, and powerful debugging tools.
+---
+
+## Performance Monitoring
+
+### Interactive Dashboard
+
+Monitor your application with response time charts, request analytics, and week-over-week trend analysis. Beautiful responsive interface with dark/light mode support.
+
+### SQL Query Tracking
+
+Track SQL query performance with slow query identification and configurable thresholds. Quickly identify database bottlenecks.
+
+### Route-Specific Metrics
+
+Get granular insights with route-specific metrics and configurable performance thresholds. See exactly which endpoints need optimization.
+
+### Background Job Monitoring
+
+Comprehensive job tracking with execution monitoring, failure analysis, and performance metrics across all ActiveJob adapters.
+
+## Background Job Tracking
+
+Rails Pulse provides universal job tracking compatible with all ActiveJob adapters:
+
+- **Universal job tracking** compatible with all ActiveJob adapters
+- Monitor job performance, failures, and retries
+- Track individual job executions with detailed metrics
+- View operations and SQL queries executed during jobs
+- Configurable privacy controls for job arguments
+
+### Supported Adapters
+
+Works seamlessly with:
+
+- **Sidekiq** - Enhanced tracking via custom middleware
+- **Solid Queue** - Universal ActiveJob tracking
+- **Good Job** - Universal ActiveJob tracking
+- **Delayed Job** - Enhanced tracking via custom plugin
+- **Resque** - Universal ActiveJob tracking
+- **Any ActiveJob adapter** - Falls back to universal tracking
+
+:::note[No Configuration Required]
+Job tracking works out of the box with your existing setup. Access the jobs dashboard at `/rails_pulse/jobs` to view aggregate metrics, individual executions, and filter by time range, status, queue, and performance thresholds.
+:::
+
+## Developer Experience
+
+### Zero Configuration
+
+Start collecting performance data immediately after installation with sensible defaults. No complex setup required.
+
+### Beautiful Interface
+
+Modern, responsive design with dark/light mode. Built with CSS Zero, Stimulus, and Turbo for a smooth experience.
+
+### Minimal Overhead
+
+Smart caching and efficient instrumentation ensure Rails Pulse doesn't slow down your application while collecting metrics.
+
+## Organization & Filtering
+
+Rails Pulse includes a flexible tagging system for organizing and filtering your performance data:
+
+- Tag routes, requests, queries, jobs, and job runs with custom labels
+- Filter performance data by custom tags
+- Organize monitoring data by environment, priority, or custom categories
+- Tags appear as badges in all data tables for quick visual identification
+
+Learn more about the tagging system in the [Advanced Configuration](/documentation/advanced#tagging) documentation.
+
+## Technology Stack
+
+Rails Pulse is built using modern, battle-tested technologies:
+
+### Frontend Technologies
+
+- **CSS Zero** - Modern utility-first CSS framework bundled for asset independence
+- **Stimulus** - Progressive JavaScript framework for enhanced interactivity
+- **Turbo** - Fast navigation and real-time updates without full page reloads
+- **Turbo Frames** - Lazy loading and partial page updates for optimal performance
+
+### Data Visualization
+
+- **Rails Charts** - Rails wrapper around Apache ECharts
+- **Lucide Icons** - Beautiful, consistent iconography with pre-compiled SVG bundle
+
+### Asset Management
+
+- **Pre-compiled Assets** - All CSS, JavaScript, and icons bundled into the gem
+- **CSP-Safe Implementation** - Secure DOM methods and nonce-based asset loading
+- **Zero External Dependencies** - Self-contained assets work with any Rails build system
+
+## Multiple Database Support
+
+Rails Pulse supports multiple database backends:
+
+- **SQLite** - Perfect for development and small applications
+- **PostgreSQL** - Production-ready with excellent performance
+- **MySQL** - Full compatibility with MySQL/MariaDB
+
+You can store Rails Pulse data in your main database or use a separate dedicated database for complete isolation.
+
+See the [Database](/documentation/database) documentation for configuration options.
+
+## Next Steps
+
+### Setup Authentication
+
+Secure your monitoring dashboard with flexible authentication options.
+
+[Configure Auth →](/documentation/authentication)
+
+### Advanced Configuration
+
+Customize thresholds, tagging, and data retention policies.
+
+[View Advanced →](/documentation/advanced)

@@ -1,0 +1,315 @@
+---
+title: Testing Guide
+description: Testing Rails Pulse for contributors and developers
+---
+
+This guide is for developers who want to contribute to Rails Pulse or verify their installation. Rails Pulse includes a comprehensive test suite designed for speed and reliability across multiple databases and Rails versions.
+
+## Quick Start
+
+Run the complete test suite with a single command:
+
+```bash
+# Run all tests (unit, functional, integration, instrumentation)
+rails test:all
+```
+
+This runs all test types against the default database (SQLite) and is the fastest way to verify everything works.
+
+## Running Individual Test Types
+
+Rails Pulse organizes tests into logical categories for faster iteration during development:
+
+### Unit Tests
+
+Test models, helpers, and utility classes:
+
+```bash
+rails test:unit
+```
+
+### Functional Tests
+
+Test controllers and views:
+
+```bash
+rails test:functional
+```
+
+### Integration Tests
+
+Test end-to-end workflows and feature interactions:
+
+```bash
+rails test:integration
+```
+
+### Individual Test Files
+
+Run a specific test file during development:
+
+```bash
+rails test test/models/rails_pulse/request_test.rb
+```
+
+## Multi-Database Testing
+
+Rails Pulse supports SQLite, PostgreSQL, and MySQL. Test against all databases to ensure compatibility.
+
+### Test Matrix (All Combinations)
+
+Run tests against all database and Rails version combinations locally:
+
+```bash
+# Test all database and Rails version combinations
+rails test:matrix
+```
+
+This tests:
+
+- **Databases:** SQLite3, PostgreSQL, MySQL2 (local testing only)
+- **Rails versions:** 7.2, 8.0
+
+**Note:** CI only tests SQLite3 + PostgreSQL for reliability. MySQL is available for local testing but excluded from CI.
+
+### Individual Database Testing
+
+Test with a specific database:
+
+```bash
+# Test with SQLite (default)
+rails test:all
+
+# Test with PostgreSQL
+DB=postgresql FORCE_DB_CONFIG=true rails test:all
+
+# Test with MySQL (local only)
+DB=mysql2 FORCE_DB_CONFIG=true rails test:all
+```
+
+## Development Environment Setup
+
+To run multi-database tests locally, you'll need to configure PostgreSQL and optionally MySQL.
+
+### 1. Copy Environment Template
+
+```bash
+cp .env.example .env
+```
+
+### 2. Configure Database Credentials
+
+Edit `.env` with your database credentials:
+
+```bash title=".env"
+# PostgreSQL Configuration (used in CI + local)
+POSTGRES_USERNAME=your_username
+POSTGRES_PASSWORD=your_password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+# MySQL Configuration (local testing only)
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=your_password
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+```
+
+### 3. Create Test Databases
+
+```bash
+# PostgreSQL
+createdb rails_pulse_test
+
+# MySQL
+mysql -u root -p -e "CREATE DATABASE rails_pulse_test;"
+```
+
+### 4. Verify Setup
+
+Test that each database connection works:
+
+```bash
+# SQLite (should always work)
+rails test:all
+
+# PostgreSQL
+DB=postgresql FORCE_DB_CONFIG=true rails test:all
+
+# MySQL
+DB=mysql2 FORCE_DB_CONFIG=true rails test:all
+```
+
+## CI Testing
+
+Rails Pulse uses GitHub Actions for continuous integration. The CI pipeline automatically tests multiple configurations to catch compatibility issues early.
+
+### What CI Tests
+
+- **Databases:** SQLite3 (in-memory), PostgreSQL (service)
+- **Rails versions:** 7.2, 8.0
+- **Test types:** Unit, functional, integration, system
+
+### Local vs CI Differences
+
+| Aspect | Local Testing | CI Testing |
+|--------|---------------|------------|
+| **Databases** | SQLite3, PostgreSQL, MySQL2 | SQLite3, PostgreSQL only |
+| **MySQL Support** | Available for testing | Excluded (reliability issues) |
+| **SQLite Mode** | File-based | In-memory (faster) |
+| **Database Switching** | Requires `FORCE_DB_CONFIG=true` | Automatic per job |
+
+### Why MySQL is Excluded from CI
+
+MySQL tests work locally but are excluded from CI due to service flakiness in GitHub Actions. Rails Pulse fully supports MySQL in production - the exclusion is purely for CI reliability.
+
+## Performance Benchmarking
+
+Rails Pulse includes built-in benchmarking tools to measure performance impact. These are useful for contributors working on performance optimizations.
+
+### Setup
+
+Add benchmarking gems to your Gemfile:
+
+```ruby title="Gemfile"
+group :development, :test do
+  gem 'benchmark-ips'
+  gem 'memory_profiler'
+end
+```
+
+```bash
+bundle install
+```
+
+### Run All Benchmarks
+
+```bash
+bundle exec rake rails_pulse:benchmark:all
+```
+
+### Run Specific Benchmarks
+
+```bash
+# Memory usage analysis
+bundle exec rake rails_pulse:benchmark:memory
+
+# Request overhead measurement
+bundle exec rake rails_pulse:benchmark:request_overhead
+
+# Middleware performance
+bundle exec rake rails_pulse:benchmark:middleware
+```
+
+See the [Performance Impact Guide](/documentation/performance) for detailed information on interpreting benchmark results and optimization strategies.
+
+## Testing Best Practices
+
+### Run Tests Before Committing
+
+Always run `rails test:all` before pushing changes to catch regressions early.
+
+### Test Against Multiple Databases
+
+If your changes affect database queries or migrations, test with PostgreSQL and MySQL in addition to SQLite.
+
+### Use Test:Matrix for Major Changes
+
+Before releasing or making significant changes, run `rails test:matrix` to test all combinations.
+
+### Keep Tests Fast
+
+Use factories and fixtures efficiently. Fast tests encourage frequent testing during development.
+
+### Write Tests for Bug Fixes
+
+When fixing a bug, write a failing test first to verify the fix and prevent regressions.
+
+### Check CI Results
+
+Even if tests pass locally, always check CI results before merging. CI may catch environment-specific issues.
+
+## Troubleshooting Test Failures
+
+### Database Connection Errors
+
+**Problem:** Tests fail with database connection errors
+
+**Solution:** Ensure your `.env` file has correct credentials and databases exist:
+
+```bash
+# PostgreSQL
+createdb rails_pulse_test
+
+# MySQL
+mysql -u root -p -e "CREATE DATABASE rails_pulse_test;"
+```
+
+### Random Test Failures
+
+**Problem:** Tests pass individually but fail when run together
+
+**Solution:** This usually indicates shared state or improper cleanup. Check for:
+
+- Missing database rollback in tests
+- Global state not being reset between tests
+- Test order dependencies
+
+### MySQL-Specific Failures
+
+**Problem:** Tests pass with SQLite/PostgreSQL but fail with MySQL
+
+**Solution:** MySQL has stricter SQL requirements. Common issues:
+
+- Case sensitivity in table/column names
+- Different default values for columns
+- Stricter datetime handling
+
+### Slow Test Runs
+
+**Problem:** Tests take too long to run
+
+**Solutions:**
+
+- Run specific test files during development instead of full suite
+- Use SQLite for fastest iteration (file-based, no server)
+- Consider using parallel testing: `rails test:all -- --parallel`
+
+## Contributing Tests
+
+When contributing to Rails Pulse, well-tested code is essential. Here's what we look for:
+
+### Test Coverage
+
+- New features should include tests for happy paths and edge cases
+- Bug fixes should include regression tests
+- Aim for meaningful coverage, not just high percentages
+
+### Test Quality
+
+- Tests should be readable and maintainable
+- Use descriptive test names that explain what's being tested
+- One assertion per test when possible
+- Avoid brittle tests that break on minor changes
+
+### Running Pre-Release Tests
+
+Before releasing, maintainers run comprehensive validation:
+
+```bash
+rake test_release
+```
+
+This validates:
+
+- Git status (clean working directory)
+- Code linting (RuboCop)
+- Asset building
+- Gem building
+- Generator tests
+- Full test matrix (all databases + Rails versions)
+
+## Next Steps
+
+- [Contributing Guide](https://github.com/railspulse/rails_pulse/blob/main/CONTRIBUTING.md) - Learn how to contribute code, documentation, and ideas to Rails Pulse
+- [Performance Impact](/documentation/performance) - Understand performance benchmarking and optimization strategies

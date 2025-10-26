@@ -1,0 +1,191 @@
+---
+title: Performance Impact
+description: Understand Rails Pulse's performance overhead and learn how to measure and minimize its impact on your application.
+---
+
+## Overview
+
+Rails Pulse is designed with performance in mind, using minimal instrumentation overhead and efficient database queries. However, as with any monitoring solution, there is some measurable impact on your application's performance.
+
+Based on comprehensive benchmarking with PostgreSQL on Apple Silicon (M1/M2), here are the typical performance overheads:
+
+## Expected Performance Impact
+
+### Request Processing Overhead
+
+| Metric | Impact | Notes |
+|--------|--------|-------|
+| **Middleware latency** | **5-6ms** per request | Includes request tracking, DB writes, and context setup |
+| Request creation | 5.5ms per request | Database write for request record |
+| Request + Operations | 9.8ms per request | Request record + SQL operation tracking |
+| Memory allocation | ~830 KB per request | Request + operation objects (garbage collected) |
+| Database writes | 1-2 writes per request | Request record + operations (batched when possible) |
+
+:::note[Important Notes]
+- The middleware overhead includes actual database writes, which dominate the latency
+- In production with proper database optimization (connection pooling, indexes), overhead is typically lower
+- The memory allocation is temporary and garbage collected normally
+- Most overhead comes from persisting tracking data to the database, not instrumentation
+:::
+
+### Background Job Tracking Overhead
+
+| Metric | Impact | Notes |
+|--------|--------|-------|
+| Job execution overhead | < 0.1ms per job | Negligible - tracking is nearly free |
+| Memory allocation | ~200-300 KB per job | Job + job run records |
+| Database writes | 1-2 writes per job | Job record + job run record |
+
+### Relative Impact by Request Speed
+
+- **Fast requests (< 50ms):** Overhead is more noticeable (10-12%)
+- **Average requests (100-500ms):** Moderate impact (1-5%)
+- **Slow requests (> 1000ms):** Minimal relative impact (< 1%)
+
+## Performance by Database
+
+Rails Pulse's overhead varies by database adapter due to different write performance characteristics:
+
+| Database | Request Overhead | Notes |
+|----------|------------------|-------|
+| **SQLite** | 4-6ms | Good for development, limited concurrency |
+| **PostgreSQL** | 5-6ms | Recommended for production with proper tuning |
+| **MySQL** | 5-7ms | Good for production with proper indexes |
+
+### Performance Optimization Tips
+
+- Use connection pooling to reduce DB connection overhead
+- Ensure proper indexes exist on `occurred_at`, `route_id`, and `query_id` columns
+- Consider async job processing for high-traffic applications (> 10,000 RPM)
+- Use a separate database for Rails Pulse in high-traffic scenarios
+
+## Minimizing Performance Impact
+
+### 1. Configure Data Retention
+
+Reduce database writes by configuring shorter retention periods:
+
+```ruby
+RailsPulse.configure do |config|
+  # Keep data for 7 days instead of 30
+  config.full_retention_period = 7.days
+
+  # Limit maximum records per table
+  config.max_table_records = {
+    rails_pulse_requests: 25_000,
+    rails_pulse_operations: 50_000,
+    rails_pulse_queries: 5_000
+  }
+end
+```
+
+### 2. Filter Low-Value Routes
+
+Ignore health checks, status endpoints, and other low-value routes:
+
+```ruby
+RailsPulse.configure do |config|
+  config.track_assets = false
+
+  config.ignored_routes = [
+    "/health",
+    "/status",
+    %r{^/admin/}
+  ]
+end
+```
+
+### 3. Use a Separate Database
+
+For high-traffic applications, use a separate database:
+
+```ruby
+RailsPulse.configure do |config|
+  config.connects_to = {
+    database: { writing: :rails_pulse, reading: :rails_pulse }
+  }
+end
+```
+
+### 4. Disable in Test Environment
+
+```ruby
+RailsPulse.configure do |config|
+  config.enabled = !Rails.env.test?
+end
+```
+
+## Real-World Examples
+
+### Small Application (< 1,000 RPM)
+
+**Configuration:**
+- Single SQLite database
+- Default retention settings
+- All features enabled
+
+**Impact:**
+- Average request overhead: **0.2ms** (< 1% of request time)
+- Memory overhead: 12 KB per request
+- Database size: 50 MB after 30 days
+
+### Medium Application (1,000-10,000 RPM)
+
+**Configuration:**
+- PostgreSQL database
+- 14-day retention
+- Asset tracking disabled
+
+**Impact:**
+- Average request overhead: **0.3ms** (< 0.5% of request time)
+- Memory overhead: 10 KB per request
+- Database size: 500 MB after 14 days
+
+### Large Application (> 10,000 RPM)
+
+**Configuration:**
+- Separate PostgreSQL database
+- 7-day retention
+- Aggressive filtering (assets, health checks, admin routes)
+- Job argument capture disabled
+
+**Impact:**
+- Average request overhead: **0.4ms** (< 0.3% of request time)
+- Memory overhead: 8 KB per request
+- Database size: 2 GB after 7 days
+
+## When to Use Rails Pulse
+
+### Recommended For
+
+- Development and staging environments (always)
+- Low-traffic production sites (< 1,000 RPM)
+- Medium-traffic sites with optimization (1,000-10,000 RPM)
+- Debugging performance issues in production (enable temporarily)
+
+### Use With Caution
+
+- High-traffic production sites (> 10,000 RPM)
+- Requires careful configuration
+- Use separate database
+- Aggressive route filtering
+- Consider sampling (track only % of requests)
+
+## Key Takeaways
+
+- Rails Pulse adds approximately **5-6ms per request** due to database writes
+- For typical requests (100-500ms), this represents **1-5%** of total request time
+- The overhead is primarily from persisting tracking data, not from instrumentation itself
+- Use aggressive filtering to reduce overhead (ignore assets, health checks, etc.)
+- Configure shorter retention periods (7 days vs 30 days) for high-traffic sites
+- Consider a separate database for Rails Pulse data in production
+- The overhead is a reasonable tradeoff for the detailed insights Rails Pulse provides
+
+:::tip[Need More Details?]
+For comprehensive benchmarking methodology, running your own benchmarks, and advanced optimization strategies, see the full [Performance Impact Guide](https://github.com/railspulse/rails_pulse/blob/main/docs/performance_impact.md) on GitHub.
+:::
+
+## Next Steps
+
+- [Advanced Configuration](/documentation/advanced/) - Learn how to configure thresholds, filtering, and data retention
+- [Database Setup](/documentation/database/) - Consider using a separate database for high-traffic applications

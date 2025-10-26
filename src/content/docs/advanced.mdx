@@ -1,0 +1,191 @@
+---
+title: Advanced Configuration
+description: Customize Rails Pulse with performance thresholds, tagging, filtering, and data management options.
+---
+
+## Performance Thresholds
+
+Configure performance thresholds to categorize requests, routes, queries, and jobs:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  # Route thresholds (in milliseconds)
+  config.route_thresholds = {
+    slow: 500,
+    very_slow: 1500,
+    critical: 3000
+  }
+
+  # Request thresholds (in milliseconds)
+  config.request_thresholds = {
+    slow: 700,
+    very_slow: 2000,
+    critical: 4000
+  }
+
+  # Query thresholds (in milliseconds)
+  config.query_thresholds = {
+    slow: 100,
+    very_slow: 500,
+    critical: 1000
+  }
+
+  # Job thresholds (in milliseconds)
+  config.job_thresholds = {
+    slow: 5_000,      # 5 seconds
+    very_slow: 30_000, # 30 seconds
+    critical: 60_000   # 1 minute
+  }
+end
+```
+
+## Filtering & Ignoring
+
+Exclude specific routes, requests, queries, or jobs from tracking:
+
+```ruby
+RailsPulse.configure do |config|
+  # Ignore specific routes
+  config.ignored_routes = ["/health", /\A\/api\/internal/]
+
+  # Ignore asset requests
+  config.track_assets = false
+
+  # Ignore specific job classes
+  config.ignored_jobs = [
+    "ActiveStorage::AnalyzeJob",
+    "ActiveStorage::PurgeJob"
+  ]
+
+  # Ignore specific queues
+  config.ignored_queues = ["low_priority", "mailers"]
+end
+```
+
+## Tagging System
+
+Organize and categorize performance data with custom tags:
+
+### Configure Available Tags
+
+```ruby
+RailsPulse.configure do |config|
+  config.tags = [
+    "production",
+    "staging",
+    "critical",
+    "needs-optimization",
+    "high-traffic"
+  ]
+end
+```
+
+### Tag from the UI
+
+1. Navigate to any route, request, query, job, or job run detail page
+2. Click the "+ tag" button
+3. Select from your configured tags
+4. Remove tags by clicking the × button
+
+### Tag Programmatically
+
+```ruby
+# Tag a route
+route = RailsPulse::Route.find_by(path: "/api/users")
+route.add_tag("critical")
+route.add_tag("high-traffic")
+
+# Tag a query
+query = RailsPulse::Query.find_by(normalized_sql: "SELECT...")
+query.add_tag("needs-optimization")
+
+# Remove a tag
+route.remove_tag("critical")
+```
+
+## Data Management & Cleanup
+
+Prevent database growth with automatic cleanup strategies:
+
+### Cleanup Configuration
+
+```ruby
+RailsPulse.configure do |config|
+  # Enable automatic cleanup
+  config.archiving_enabled = true
+
+  # Time-based retention (delete records older than this)
+  config.full_retention_period = 30.days
+
+  # Count-based retention (maximum records per table)
+  config.max_table_records = {
+    rails_pulse_operations: 100_000,
+    rails_pulse_requests: 50_000,
+    rails_pulse_job_runs: 50_000,
+    rails_pulse_queries: 10_000,
+    rails_pulse_routes: 1_000,
+    rails_pulse_jobs: 1_000
+  }
+end
+```
+
+### Manual Cleanup
+
+```bash
+# Run cleanup manually
+rails rails_pulse:cleanup
+
+# Check database status
+rails rails_pulse:cleanup_stats
+
+# Schedule via background job
+RailsPulse::CleanupJob.perform_later
+```
+
+## Background Job Configuration
+
+```ruby
+RailsPulse.configure do |config|
+  # Enable job tracking
+  config.track_jobs = true
+
+  # Capture job arguments (disabled by default for privacy)
+  config.capture_job_arguments = false
+end
+```
+
+:::caution[Privacy Warning]
+Job argument capture is disabled by default to protect sensitive information. Only enable in development or when explicitly needed for debugging.
+:::
+
+## Disabling Rails Pulse
+
+Disable Rails Pulse per environment:
+
+```ruby
+RailsPulse.configure do |config|
+  # Disable in test environment
+  config.enabled = !Rails.env.test?
+end
+```
+
+## Next Steps
+
+<div class="grid-2">
+  <div>
+    ### Explore Features
+
+    Learn more about the dashboard, SQL tracking, and job monitoring.
+
+    [View Features →](/documentation/features/)
+  </div>
+
+  <div>
+    ### Common Questions
+
+    Find answers to frequently asked questions.
+
+    [View FAQ →](/documentation/faq/)
+  </div>
+</div>

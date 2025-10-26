@@ -1,0 +1,431 @@
+---
+// Rails Pulse Index Page
+---
+
+<!DOCTYPE html>
+<html lang="en" class="theme-light">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Rails Pulse — Performance monitoring and debugging for Rails applications</title>
+  <meta content="Comprehensive performance monitoring and debugging gem for Rails. Track response times, SQL queries, and route performance with a beautiful dashboard. Zero configuration, multiple database support." name="description" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Rails Pulse" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="Rails Pulse — Performance monitoring and debugging for Rails" />
+  <meta property="og:description" content="Comprehensive performance monitoring and debugging gem for Rails applications. Track response times, SQL queries, and route performance with zero configuration." />
+  <meta property="og:url" content="https://github.com/railspulse/rails_pulse" />
+  <meta property="og:image" content="https://railspulse.com/images/social-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Rails Pulse — Performance monitoring and debugging for Rails" />
+  <meta name="twitter:description" content="Comprehensive performance monitoring and debugging gem for Rails. Zero configuration, beautiful dashboard, multiple database support." />
+  <meta name="twitter:image" content="https://railspulse.com/images/social-image.jpg" />
+  <meta name="twitter:url" content="https://github.com/railspulse/rails_pulse" />
+
+  <!-- Favicon and icons -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/images/favicon/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/images/favicon/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/images/favicon/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/images/favicon/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/images/favicon/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/images/favicon/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/images/favicon/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/images/favicon/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/images/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+
+  <!-- Preload fonts -->
+  <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin />
+
+  <!-- Styles -->
+  <link href="/vendor/font-awesome-6.7.2/css/all.min.css" rel="stylesheet" />
+  <link href="/css/index.css" rel="stylesheet" type="text/css" />
+  <link href="/css/tablet.css" rel="stylesheet" type="text/css" />
+  <link href="/css/mobile.css" rel="stylesheet" type="text/css" />
+  <script src="/js/main.js" type="text/javascript" defer></script>
+</head>
+
+<body>
+  <div class="background-gradient"></div>
+  <div class="page-container">
+    <header class="nav-container">
+      <a href="/" class="nav-brand">
+        <img src="/images/rails-pulse-logo.png" width="40" height="40" alt="Rails Pulse" />
+        <span>Rails Pulse</span>
+      </a>
+      <nav role="navigation" class="nav-menu" data-navigation>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="/documentation/installation" class="nav-link">Docs</a>
+        <a href="https://github.com/railspulse/rails_pulse" class="nav-link">GitHub ↗</a>
+        <div class="button-group stacked margin-top-l mobile-only">
+          <a href="https://github.com/railspulse/rails_pulse#installation" class="button primary">Get Started</a>
+        </div>
+      </nav>
+      <div class="button-group">
+        <a href="https://github.com/railspulse/rails_pulse" class="button ghost compact hide-on-mobile">
+          <div class="fa-brands fa-github icon l"></div>
+          <div class="paragraph s tertiary">Star</div>
+        </a>
+        <a href="https://github.com/railspulse/rails_pulse#installation" class="button primary compact">Get Started</a>
+        <button class="button ghost compact nav-hamburger" data-mobile-toggle aria-label="Show menu">
+          <span class="fa-solid fa-bars icon m"></span>
+        </button>
+      </div>
+    </header>
+    <main>
+      <section>
+        <div class="heading hero centered">
+          <a href="https://github.com/railspulse/rails_pulse/releases" class="eyebrow">Open Source & MIT Licensed</a>
+          <h1 class="balanced">
+            Performance monitoring and debugging for Rails applications
+          </h1>
+          <p class="paragraph m secondary balanced">
+            Built as a Rails Engine, Rails Pulse seamlessly integrates with your existing application to capture, analyze, and visualize performance metrics without impacting your production workload.
+          </p>
+          <div class="button-group margin-paragraph centered">
+            <a href="https://github.com/railspulse/rails_pulse#installation" class="button primary">Get Started</a>
+            <a href="https://github.com/railspulse/rails_pulse" class="button tertiary">View on GitHub</a>
+          </div>
+        </div>
+        <div class="image-wide">
+          <img src="/images/dashboard.jpg" width="100%" style="aspect-ratio: 2356 / 1404"
+            alt="Rails Pulse Dashboard showing performance metrics" />
+        </div>
+      </section>
+      <section id="features">
+        <div class="heading">
+          <h2 class="no-top-margin">Comprehensive Performance Monitoring</h2>
+          <p class="paragraph m secondary">
+            Rails Pulse provides deep insights into your Rails application's health with an interactive dashboard, SQL query tracking, and route-specific metrics—all without complex configuration.
+          </p>
+        </div>
+        <div class="grid">
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                Interactive Dashboard
+              </h3>
+              <p class="paragraph m secondary">
+                Monitor your application with response time charts, request analytics, and week-over-week trend analysis. Beautiful responsive interface with dark/light mode support gives you actionable insights at a glance.
+              </p>
+            </div>
+            <img src="/images/interactive-dashboard.gif" loading="lazy" width="100%"
+              alt="Dashboard with response time charts and analytics"
+              class="rounded-image" />
+          </div>
+        </div>
+        <div class="grid columns-2">
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                SQL Query Performance
+              </h3>
+              <p class="paragraph s secondary">
+                Track SQL query performance with slow query identification and configurable thresholds. Quickly identify database bottlenecks and optimize your most expensive queries.
+              </p>
+            </div>
+            <img src="/images/sql-query-performance.jpg" loading="lazy" width="100%"
+              alt="SQL query performance tracking interface" class="rounded-image" />
+          </div>
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                Route-Specific Metrics
+              </h3>
+              <p class="paragraph s secondary">
+                Get granular insights with route-specific metrics and configurable performance thresholds. See exactly which endpoints need optimization.
+              </p>
+            </div>
+            <img src="/images/routes-specific-metrics.jpg" loading="lazy" width="100%"
+              alt="Route performance metrics view" class="rounded-image" />
+          </div>
+        </div>
+        <div class="grid columns-3">
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                Zero Configuration
+              </h3>
+              <p class="paragraph s secondary">
+                Start collecting performance data immediately after installation with sensible defaults. No complex setup required.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                Multiple Databases
+              </h3>
+              <p class="paragraph s secondary">
+                Full support for SQLite, PostgreSQL, and MySQL. Store monitoring data in your main database or use a separate dedicated database for complete isolation.
+              </p>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-heading">
+              <h3 class="color-accent no-top-margin">
+                Smart Data Cleanup
+              </h3>
+              <p class="paragraph s secondary">
+                Automatic data archiving prevents database bloat while preserving essential insights. Configure time-based and count-based retention policies.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="heading centered">
+          <h2 class="no-top-margin">Built for Developers</h2>
+          <p class="paragraph m secondary">
+            Rails Pulse is designed with developer experience in mind. Everything you need to monitor, debug, and optimize your Rails application.
+          </p>
+        </div>
+        <div class="cards-with-icons-container">
+          <div class="card-with-icon horizontal">
+            <div class="fa-solid fa-gauge-high icon xl color-accent"></div>
+            <div class="feature-heading">
+              <p class="paragraph m bold">Minimal Performance Overhead</p>
+              <p class="paragraph m secondary">
+                Smart caching and efficient instrumentation ensure Rails Pulse doesn't slow down your application while collecting metrics.
+              </p>
+            </div>
+          </div>
+          <div class="card-with-icon horizontal">
+            <div class="fa-solid fa-shield-halved icon xl color-accent"></div>
+            <div class="feature-heading">
+              <p class="paragraph m bold">Flexible Authentication</p>
+              <p class="paragraph m secondary">
+                Secure your monitoring dashboard with built-in authentication support. Works seamlessly with Devise or any authentication system.
+              </p>
+            </div>
+          </div>
+          <div class="card-with-icon horizontal">
+            <div class="fa-solid fa-palette icon xl color-accent"></div>
+            <div class="feature-heading">
+              <p class="paragraph m bold">
+                Beautiful Interface
+              </p>
+              <p class="paragraph m secondary">
+                Modern, responsive design built with CSS Zero, Stimulus, and Turbo. Dark/light mode support and CSP-compliant by default.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="heading">
+          <h2 class="no-top-margin">Quick Installation</h2>
+          <p class="paragraph m secondary">
+            Add Rails Pulse to your application in minutes. Simply add the gem, run the installer, and you're ready to start monitoring.
+          </p>
+          <div class="button-group margin-paragraph">
+            <a href="https://github.com/railspulse/rails_pulse#installation" class="button secondary">View Full Documentation</a>
+          </div>
+        </div>
+        <div class="image-wide">
+          <img src="/images/request.jpg" loading="lazy" width="100%" alt="Rails Pulse interface showing request details" />
+        </div>
+      </section>
+      <section>
+        <div class="grid columns-1/2-1 gap-xl">
+          <div class="heading">
+            <h2 class="no-top-margin">Get Started in Minutes</h2>
+            <p class="paragraph m secondary">
+              Add Rails Pulse to your Gemfile, run the installer, and mount the engine. That's it! Start monitoring your application's performance immediately with zero configuration.
+            </p>
+          </div>
+          <div class="card-code-block dark">
+            <pre class="shiki github-dark-default" style="margin: 0px; color: #e6edf3" tabindex="0"><code><span class="line"><span style="color:#8B949E"># Gemfile</span></span>
+<span class="line"><span style="color:#FF7B72">gem</span><span style="color:#E6EDF3"> </span><span style="color:#A5D6FF">'rails_pulse'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E"># Install</span></span>
+<span class="line"><span style="color:#E6EDF3">$ bundle install</span></span>
+<span class="line"><span style="color:#E6EDF3">$ rails generate rails_pulse:install</span></span>
+<span class="line"><span style="color:#E6EDF3">$ rails db:migrate</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E"># config/routes.rb</span></span>
+<span class="line"><span style="color:#E6EDF3">Rails.application.routes.draw </span><span style="color:#FF7B72">do</span></span>
+<span class="line"><span style="color:#E6EDF3">  mount RailsPulse::Engine </span><span style="color:#FF7B72">=&gt;</span><span style="color:#E6EDF3"> </span><span style="color:#A5D6FF">"/rails_pulse"</span></span>
+<span class="line"><span style="color:#FF7B72">end</span></span></code></pre>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="heading centered">
+          <h2 class="no-top-margin">Frequently Asked Questions</h2>
+          <p class="paragraph m secondary">
+            Everything you need to know about Rails Pulse
+          </p>
+        </div>
+        <div class="accordion-container">
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">What Rails versions are supported?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Rails Pulse supports Rails 7.2+ and Ruby 3.3+. It's built as a Rails Engine and follows Rails best practices, ensuring compatibility with the latest Rails versions.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">
+                Does Rails Pulse impact my application's performance?
+              </p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Rails Pulse is designed with minimal performance overhead in mind. It uses smart caching, efficient instrumentation, and Rails' built-in ActiveSupport::Notifications to collect metrics without slowing down your application. You can enable or disable it per environment.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">Can I use a separate database for Rails Pulse?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>Yes! Rails Pulse supports two database configurations:</p>
+              <ol role="list">
+                <li>
+                  <strong>Single Database (default)</strong> - Stores data in your main application database. Simple setup with zero additional configuration.
+                </li>
+                <li>
+                  <strong>Separate Database</strong> - Use a dedicated database for complete isolation. Supports SQLite, PostgreSQL, and MySQL. Perfect for scaling monitoring independently or using different database engines.
+                </li>
+              </ol>
+              <p>Install with <code>--database=separate</code> flag to use a separate database.</p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">How do I secure the Rails Pulse dashboard?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Rails Pulse includes flexible authentication support. You can configure authentication in the initializer to work with Devise, custom authentication systems, or any authentication method. Simply define your authentication logic in the configuration.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">How does data cleanup work?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Rails Pulse offers automatic data archiving with two strategies:
+              </p>
+              <ol role="list">
+                <li>
+                  <strong>Time-based cleanup</strong> - Automatically delete records older than a configured period (default: 2 weeks)
+                </li>
+                <li>
+                  <strong>Count-based cleanup</strong> - Enforce maximum record limits per table to prevent excessive storage use
+                </li>
+              </ol>
+              <p>
+                Schedule the <code>RailsPulse::CleanupJob</code> to run daily, or run cleanup manually with <code>rails rails_pulse:cleanup</code>.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">Is Rails Pulse free?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Yes! Rails Pulse is completely free and open source under the MIT License. No subscription fees, no usage limits, and no external dependencies. All performance data stays in your database.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-item" name="faq">
+            <summary class="accordion-toggle">
+              <p class="paragraph m bold">How is Rails Pulse different from APM services?</p>
+              <span class="accordion-chevron fa-solid fa-chevron-down"></span>
+            </summary>
+            <div class="accordion-content">
+              <p>
+                Rails Pulse offers several advantages:
+              </p>
+              <ul role="list">
+                <li><strong>No external dependencies</strong> - Everything runs in your Rails application</li>
+                <li><strong>Zero monthly costs</strong> - No subscription fees or usage-based pricing</li>
+                <li><strong>Data privacy</strong> - All metrics stay in your database</li>
+                <li><strong>Full customization</strong> - Complete control over thresholds and interface</li>
+                <li><strong>Rails-native</strong> - Built specifically for Rails with deep framework integration</li>
+              </ul>
+              <p>Perfect for development, staging, and cost-conscious production monitoring.</p>
+            </div>
+          </details>
+        </div>
+      </section>
+      <section class="promo-cta">
+        <div class="heading centered">
+          <h2>Start monitoring your Rails app today</h2>
+          <div class="button-group margin-paragraph centered">
+            <a href="https://github.com/railspulse/rails_pulse#installation" class="button primary">Get Started</a>
+            <a href="https://github.com/railspulse/rails_pulse" class="button tertiary">View on GitHub</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="footer-menu">
+        <div>
+          <p class="paragraph s">
+            © 2025 Rails Pulse<br />Open source under the MIT License<br />Built with ❤️ for the Rails community
+          </p>
+        </div>
+        <div>
+          <div class="link-list">
+            <a href="/documentation/installation" class="ui s">Documentation</a>
+            <a href="#features" class="ui s">Features</a>
+            <a href="https://github.com/railspulse/rails_pulse/blob/main/CONTRIBUTING.md" class="ui s" target="_blank">Contributing ↗</a>
+          </div>
+        </div>
+        <div>
+          <div class="link-list">
+            <a href="https://github.com/railspulse/rails_pulse" class="icon-link ui s" target="_blank">
+              <div class="fa-brands fa-github icon m color-accent"></div>
+              <div class="pseudo-link">GitHub</div>
+            </a>
+            <a href="https://github.com/railspulse/rails_pulse/issues" class="icon-link ui s" target="_blank">
+              <div class="fa-solid fa-bug icon m color-accent"></div>
+              <div class="pseudo-link">Issues</div>
+            </a>
+            <a href="/licenses" class="icon-link ui s">
+              <div class="fa-solid fa-scale-balanced icon m color-accent"></div>
+              <div class="pseudo-link">License</div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="link-list-horizontal">
+        <a href="https://opensource.org/licenses/MIT" class="ui s tertiary" target="_blank">MIT License</a>
+        <a href="https://github.com/railspulse/rails_pulse/blob/main/README.md" class="ui s tertiary" target="_blank">README</a>
+      </div>
+    </footer>
+  </div>
+</body>
+
+</html>

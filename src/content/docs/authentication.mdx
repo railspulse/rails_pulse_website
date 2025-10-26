@@ -1,0 +1,134 @@
+---
+title: Authentication
+description: Secure your Rails Pulse dashboard with flexible authentication options
+---
+
+Rails Pulse supports flexible authentication to secure access to your monitoring dashboard. Works with any authentication system including Devise, custom solutions, and more.
+
+## Authentication Setup
+
+Enable authentication by configuring the following options in your Rails Pulse initializer:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  # Enable authentication
+  config.authentication_enabled = true
+
+  # Where to redirect unauthorized users (optional, defaults to "/")
+  config.authentication_redirect_path = "/login"
+
+  # Define your authentication logic
+  config.authentication_method = proc {
+    # Your authentication logic here
+  }
+end
+```
+
+## Devise with Admin Role
+
+The most common authentication pattern uses Devise with an admin role check:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  config.authentication_enabled = true
+
+  config.authentication_method = proc {
+    unless user_signed_in? && current_user.admin?
+      redirect_to main_app.root_path, alert: "Access denied"
+    end
+  }
+end
+```
+
+This ensures only signed-in admin users can access the Rails Pulse dashboard.
+
+## Custom Authorization Logic
+
+You can implement any custom authorization logic based on your application's needs:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  config.authentication_enabled = true
+
+  config.authentication_method = proc {
+    current_user = User.find_by(id: session[:user_id])
+    unless current_user&.can_access_monitoring?
+      render plain: "Forbidden", status: :forbidden
+    end
+  }
+end
+```
+
+## IP Address Restriction
+
+Restrict access to specific IP addresses or ranges:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  config.authentication_enabled = true
+
+  config.authentication_method = proc {
+    allowed_ips = ["127.0.0.1", "::1", "10.0.0.0/8"]
+    unless allowed_ips.any? { |ip| IPAddr.new(ip).include?(request.remote_ip) }
+      render plain: "Access denied", status: :forbidden
+    end
+  }
+end
+```
+
+## HTTP Basic Authentication
+
+For simple authentication, use HTTP Basic Auth:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  config.authentication_enabled = true
+
+  config.authentication_method = proc {
+    authenticate_or_request_with_http_basic do |username, password|
+      username == ENV["RAILS_PULSE_USERNAME"] &&
+        password == ENV["RAILS_PULSE_PASSWORD"]
+    end
+  }
+end
+```
+
+:::caution[Security Warning]
+Store credentials in environment variables, never commit them to your repository. Use Rails credentials or a secrets management service in production.
+:::
+
+## Environment-Based Access
+
+Disable authentication in development, enable it in production:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  # Only require authentication in production
+  config.authentication_enabled = Rails.env.production?
+
+  config.authentication_method = proc {
+    unless user_signed_in? && current_user.admin?
+      redirect_to main_app.root_path, alert: "Access denied"
+    end
+  }
+end
+```
+
+## Best Practices
+
+- **Always enable authentication in production** - Performance data can reveal sensitive information about your application
+- **Use role-based access control** - Limit dashboard access to administrators or DevOps team members
+- **Combine authentication methods** - Use both user authentication and IP restrictions for extra security
+- **Log access attempts** - Monitor who accesses the dashboard and when
+- **Use environment variables** - Never hardcode credentials in your initializer
+
+## Next Steps
+
+- Learn about single vs separate [database configuration](/documentation/database)
+- Customize performance thresholds, tagging, and data retention in [advanced settings](/documentation/advanced)

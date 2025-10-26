@@ -1,0 +1,376 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for Rails Pulse
+---
+
+## Installation Issues
+
+### Rails Pulse Not Detected
+
+**Symptom:** Running upgrade generator shows "Rails Pulse installation not detected"
+
+**Solution:** Run the install generator first:
+
+```bash
+rails generate rails_pulse:install
+rails db:migrate
+```
+
+### Migration Already Exists Error
+
+**Symptom:** Error when running the install generator about existing migration
+
+**Solution:** Check if the migration already ran:
+
+```bash
+# For single database
+rails db:migrate:status
+
+# For separate database
+rails db:migrate:status:rails_pulse
+```
+
+If the migration shows as "up", you're already installed. If "down", run `rails db:migrate`.
+
+### Database Already Exists Error
+
+**Symptom:** Error during separate database setup about database already existing
+
+**Solution:** Use `db:prepare` instead of `db:create`:
+
+```bash
+rails db:prepare
+```
+
+This command safely creates the database if it doesn't exist, or loads the schema if it does.
+
+### Missing Columns After Gem Update
+
+**Symptom:** Errors about missing columns after updating the Rails Pulse gem
+
+**Solution:** Run the upgrade generator to detect and add missing columns:
+
+```bash
+rails generate rails_pulse:upgrade
+rails db:migrate
+```
+
+## Dashboard Issues
+
+### Dashboard Not Loading / 404 Error
+
+**Symptom:** Visiting /rails_pulse shows 404 or routing error
+
+**Solution:** Ensure Rails Pulse is mounted in your routes:
+
+```ruby title="config/routes.rb"
+Rails.application.routes.draw do
+  mount RailsPulse::Engine => "/rails_pulse"
+end
+```
+
+Restart your Rails server after adding the route.
+
+### Dashboard Shows No Data
+
+**Symptom:** Dashboard loads but shows empty charts and tables
+
+**Possible causes and solutions:**
+
+1. **Rails Pulse is disabled** - Check your initializer:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.enabled = true  # Make sure this is true
+   end
+   ```
+
+2. **No traffic yet** - Generate some requests to your application, then check the dashboard again
+
+3. **Wrong database connection** - If using separate database, verify `connects_to` configuration matches your database.yml
+
+4. **Data retention period expired** - Check if cleanup removed all data. Adjust retention period:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.full_retention_period = 30.days  # Increase if needed
+   end
+   ```
+
+### Charts Not Rendering
+
+**Symptom:** Dashboard loads but charts are missing or broken
+
+**Solution:** This is typically a JavaScript error. Check your browser console for errors and ensure:
+
+- Your Content Security Policy (CSP) allows Rails Pulse assets
+- No JavaScript conflicts with other gems or libraries
+- Rails Pulse assets are properly compiled (if using asset pipeline)
+
+## Tracking Issues
+
+### Requests Not Being Tracked
+
+**Symptom:** Some or all requests aren't appearing in Rails Pulse
+
+**Possible causes and solutions:**
+
+1. **Routes are ignored** - Check ignored routes configuration:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.ignored_routes = []  # Check if routes are excluded
+     config.track_assets = false  # Asset requests ignored by default
+   end
+   ```
+
+2. **Custom mount path not configured** - If Rails Pulse is mounted at a custom path:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.mount_path = "/admin/monitoring"  # Prevents self-tracking
+   end
+   ```
+
+3. **Middleware not loaded** - Restart your Rails server to ensure middleware is active
+
+### Background Jobs Not Being Tracked
+
+**Symptom:** Jobs page shows no data despite running background jobs
+
+**Possible causes and solutions:**
+
+1. **Job tracking disabled** - Check configuration:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.track_jobs = true  # Make sure this is true
+   end
+   ```
+
+2. **Jobs or queues are ignored** - Check ignored configuration:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.ignored_jobs = []    # Check if job class is excluded
+     config.ignored_queues = []  # Check if queue is excluded
+   end
+   ```
+
+3. **Job workers need restart** - Restart your background job workers (Sidekiq, Solid Queue, etc.)
+
+### SQL Queries Not Showing
+
+**Symptom:** Request details don't show SQL queries
+
+**Possible causes and solutions:**
+
+1. **Queries are ignored** - Check ignored queries configuration:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.ignored_queries = []  # Check if queries are excluded
+   end
+   ```
+
+2. **No database queries in request** - Some requests (redirects, static files) may not execute queries
+
+## Performance Issues
+
+### Application Slowdown After Installing
+
+**Symptom:** Noticeable performance degradation after adding Rails Pulse
+
+**Solutions:**
+
+1. **Use aggressive filtering** for high-traffic applications:
+   ```ruby
+   RailsPulse.configure do |config|
+     # Ignore low-value routes
+     config.ignored_routes = [/^\/assets/, /^\/health/]
+     config.track_assets = false
+
+     # Disable job argument capture
+     config.capture_job_arguments = false
+   end
+   ```
+
+2. **Use a separate database** to isolate monitoring overhead - see [Database documentation](/documentation/database)
+
+3. **Reduce data retention** to keep tables smaller:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.full_retention_period = 7.days  # Shorter retention
+     config.max_table_records = {
+       rails_pulse_requests: 5_000,
+       rails_pulse_operations: 25_000,
+       rails_pulse_queries: 2_000
+     }
+   end
+   ```
+
+4. **Disable in production** if overhead is unacceptable:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.enabled = Rails.env.development? || Rails.env.staging?
+   end
+   ```
+
+See the [Performance Impact Guide](/documentation/performance) for detailed optimization strategies.
+
+### Database Growing Too Large
+
+**Symptom:** Rails Pulse tables consuming excessive disk space
+
+**Solutions:**
+
+1. **Enable and configure cleanup**:
+   ```ruby
+   RailsPulse.configure do |config|
+     config.archiving_enabled = true
+     config.full_retention_period = 7.days  # Adjust as needed
+   end
+   ```
+
+2. **Schedule cleanup job** to run daily:
+   ```ruby
+   # In your job scheduler (cron, whenever, etc.)
+   RailsPulse::CleanupJob.perform_later
+   ```
+
+3. **Run manual cleanup**:
+   ```bash
+   rails rails_pulse:cleanup
+   ```
+
+4. **Check current database status**:
+   ```bash
+   rails rails_pulse:cleanup_stats
+   ```
+
+## Authentication Issues
+
+### Authentication Not Working
+
+**Symptom:** Dashboard is accessible without authentication despite configuration
+
+**Solution:** Ensure authentication is properly configured:
+
+```ruby title="config/initializers/rails_pulse.rb"
+RailsPulse.configure do |config|
+  config.authentication_enabled = true  # Must be true
+
+  config.authentication_method = proc {
+    # Your authentication logic must be in this proc
+    unless user_signed_in? && current_user.admin?
+      redirect_to main_app.root_path, alert: "Access denied"
+    end
+  }
+end
+```
+
+Restart your server after changing authentication configuration.
+
+### Redirect Loop with Authentication
+
+**Symptom:** Browser shows too many redirects error
+
+**Solution:** Make sure your authentication redirect doesn't point back to Rails Pulse:
+
+```ruby
+RailsPulse.configure do |config|
+  # Don't redirect to /rails_pulse or you'll create a loop
+  config.authentication_redirect_path = "/login"  # Not "/rails_pulse"
+end
+```
+
+### Current User Not Available
+
+**Symptom:** Error about undefined method `current_user`
+
+**Solution:** Access your authentication helpers through the main app:
+
+```ruby
+RailsPulse.configure do |config|
+  config.authentication_method = proc {
+    # For Devise or similar
+    unless send(:user_signed_in?) && send(:current_user)&.admin?
+      redirect_to main_app.root_path
+    end
+  }
+end
+```
+
+See the [Authentication documentation](/documentation/authentication) for more examples.
+
+## Database Configuration Issues
+
+### Separate Database Not Connecting
+
+**Symptom:** Errors about database connection when using separate database
+
+**Solution:** Verify your configuration matches between initializer and database.yml:
+
+```ruby title="config/initializers/rails_pulse.rb"
+RailsPulse.configure do |config|
+  config.connects_to = {
+    database: { writing: :rails_pulse, reading: :rails_pulse }
+  }
+  # ↑ This name must match the key in database.yml ↓
+end
+```
+
+```yaml title="config/database.yml"
+production:
+  # ... your main database ...
+
+  rails_pulse:  # ← Must match the name in connects_to
+    adapter: postgresql
+    database: myapp_rails_pulse_production
+    # ... rest of config ...
+```
+
+### Schema File Missing
+
+**Symptom:** Error about missing db/rails_pulse_schema.rb
+
+**Solution:** Don't delete the schema file - it's the single source of truth. If accidentally deleted, reinstall:
+
+```bash
+rails generate rails_pulse:install --force
+```
+
+### Migrations Path Not Found
+
+**Symptom:** Rails can't find migrations in db/rails_pulse_migrate
+
+**Solution:** Ensure migrations_paths is set in database.yml:
+
+```yaml
+production:
+  rails_pulse:
+    adapter: postgresql
+    database: myapp_rails_pulse
+    migrations_paths: db/rails_pulse_migrate  # Required for separate DB
+```
+
+## Still Having Issues?
+
+If you can't find a solution here, we're happy to help:
+
+### Check FAQ
+
+Browse frequently asked questions for quick answers.
+
+[View FAQ →](/documentation/faq)
+
+### Report an Issue
+
+Found a bug? Report it on GitHub Issues.
+
+[GitHub Issues →](https://github.com/railspulse/rails_pulse/issues)
+
+### When Reporting Issues
+
+Help us help you by including:
+
+- Rails Pulse version (`bundle info rails_pulse`)
+- Rails version (`rails -v`)
+- Ruby version (`ruby -v`)
+- Database adapter (SQLite, PostgreSQL, MySQL)
+- Error messages and stack traces
+- Relevant configuration from your initializer
+- Steps to reproduce the issue

@@ -1,0 +1,154 @@
+---
+title: Database Setup
+description: Rails Pulse offers two database setup options - single database (default and recommended) or separate database for complete isolation.
+---
+
+Rails Pulse offers two database setup options: single database (default and recommended) or separate database for complete isolation.
+
+## Option 1: Single Database (Default)
+
+Stores Rails Pulse data in your main application database alongside your existing tables. This is the simplest setup and works great for most applications.
+
+### Advantages
+
+- **Zero additional configuration** required
+- **Simpler backup** and deployment strategies
+- **Works with any database** (SQLite, PostgreSQL, MySQL)
+- **Easy to get started** - just run migrations
+
+### Installation
+
+```bash
+rails generate rails_pulse:install
+rails db:migrate
+```
+
+That's it! Rails Pulse tables are created in your main database and ready to use.
+
+## Option 2: Separate Database
+
+Stores Rails Pulse data in a dedicated database, completely isolated from your main application.
+
+### Use a separate database when you want:
+
+- **Isolating monitoring data** from your main application database
+- **Using different database engines** optimized for time-series data
+- **Scaling monitoring independently** from your application
+- **Simplified backup strategies** with separate retention policies
+
+### Installation
+
+Install with the `--database=separate` flag:
+
+```bash
+rails generate rails_pulse:install --database=separate
+```
+
+Then configure the `connects_to` option in your Rails Pulse initializer:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  # Single separate database
+  config.connects_to = {
+    database: { writing: :rails_pulse, reading: :rails_pulse }
+  }
+end
+```
+
+Add the database configuration to `config/database.yml` and run:
+
+```bash
+rails db:prepare
+```
+
+## Database Configuration Examples
+
+### SQLite Configuration
+
+```yaml
+# config/database.yml
+production:
+  # ... your main database ...
+  rails_pulse:
+    adapter: sqlite3
+    database: storage/rails_pulse_production.sqlite3
+    migrations_paths: db/rails_pulse_migrate
+    pool: 5
+    timeout: 5000
+```
+
+### PostgreSQL Configuration
+
+```yaml
+# config/database.yml
+production:
+  # ... your main database ...
+  rails_pulse:
+    adapter: postgresql
+    database: myapp_rails_pulse_production
+    username: rails_pulse_user
+    password: <%= Rails.application.credentials.dig(:rails_pulse, :database_password) %>
+    host: localhost
+    migrations_paths: db/rails_pulse_migrate
+    pool: 5
+```
+
+### MySQL Configuration
+
+```yaml
+# config/database.yml
+production:
+  # ... your main database ...
+  rails_pulse:
+    adapter: mysql2
+    database: myapp_rails_pulse_production
+    username: rails_pulse_user
+    password: <%= Rails.application.credentials.dig(:rails_pulse, :database_password) %>
+    host: localhost
+    migrations_paths: db/rails_pulse_migrate
+    pool: 5
+```
+
+## Primary/Replica Configuration
+
+For high-availability setups, configure Rails Pulse with primary and replica databases:
+
+```ruby
+# config/initializers/rails_pulse.rb
+RailsPulse.configure do |config|
+  config.connects_to = {
+    database: {
+      writing: :rails_pulse_primary,
+      reading: :rails_pulse_replica
+    }
+  }
+end
+```
+
+## Schema Management
+
+The schema file `db/rails_pulse_schema.rb` serves as your single source of truth for the database structure. It:
+
+- Defines all Rails Pulse tables in one place
+- Is loaded by the installation migration
+- Should not be deleted or modified
+- Future updates will provide migrations in `db/rails_pulse_migrate/`
+
+:::note[Important]
+When using a separate database, always use `rails db:prepare` instead of `rails db:migrate` to ensure the schema is loaded correctly.
+:::
+
+## Next Steps
+
+### Advanced Configuration
+
+Customize performance thresholds, tagging, and data cleanup.
+
+[View Advanced →](/documentation/advanced)
+
+### Common Questions
+
+Find answers to frequently asked questions.
+
+[View FAQ →](/documentation/faq)
